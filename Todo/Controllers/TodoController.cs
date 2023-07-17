@@ -26,35 +26,39 @@ namespace Todo.Controllers
             _iMapper = iMapper;
         }
 
-        //// GET: api/<TodoController>
-        //[HttpGet]
-        //[HttpGet]
-        //public IActionResult Get([FromQuery] TodoGetParameters todoGetParameters)
-        //{
-        //    var todos = _todoContext.TodoLists.AsQueryable();
+        // GET: api/<TodoController>
+        [HttpGet]
+        public IActionResult Get([FromQuery] TodoGetParameters todoGetParameters)
+        {
+            var todos = _todoContext.TodoLists.AsQueryable();
 
-        //    if (!string.IsNullOrEmpty(todoGetParameters.name))
-        //    {
-        //        todos = todos.Where(x => x.Name.Contains(todoGetParameters.name));
-        //    }
+            if (!string.IsNullOrEmpty(todoGetParameters.name))
+            {
+                todos = todos.Where(x => x.Name.Contains(todoGetParameters.name));
+            }
 
-        //    if (todoGetParameters.enable != null)
-        //    {
-        //        todos = todos.Where(x => x.Enable == todoGetParameters.enable);
-        //    }
+            if (todoGetParameters.enable != null)
+            {
+                todos = todos.Where(x => x.Enable == todoGetParameters.enable);
+            }
 
-        //    if (todoGetParameters.minOrder != null && todoGetParameters.maxOrder != null)
-        //    {
-        //        todos = todos.Where(x => x.Orders >= todoGetParameters.minOrder && x.Orders <= todoGetParameters.maxOrder);
-        //    }
+            if (todoGetParameters.minOrder != null && todoGetParameters.maxOrder != null)
+            {
+                todos = todos.Where(x => x.Orders >= todoGetParameters.minOrder && x.Orders <= todoGetParameters.maxOrder);
+            }
 
-        //    return Ok(todos.ToList());
-        //}
+            if (todos is null || todos.Count() <= 0)
+            { 
+                return NotFound("找不到資源");
+            }
+
+            return Ok(todos.ToList());
+        }
 
         // GET: api/<TodoController>
         // 用 AutoMapper 轉成 TodoListSelectDtos 後傳出
-        [HttpGet]
-        public IEnumerable<TodoListSelectDto> Get([FromQuery] TodoGetParameters todoGetParameters)
+        [HttpGet("GetByAutoMapper")]
+        public IEnumerable<TodoListSelectDto> GetByAutoMapper([FromQuery] TodoGetParameters todoGetParameters)
         {
             var todos = _todoContext.TodoLists
                 .Include(x => x.InsertEmployee)
@@ -107,7 +111,14 @@ namespace Todo.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(Guid id)
         {
-            return Ok(_todoContext.TodoLists.Find(id));
+            var todo = _todoContext.TodoLists.Find(id);
+
+            if (todo is null)
+            { 
+                return NotFound("找不到 id: " + id + " 的資料");
+            }
+
+            return Ok(todo);
         }
 
         // POST api/<TodoController>
