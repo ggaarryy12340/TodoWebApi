@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -76,6 +77,30 @@ namespace Todo.Controllers
             }
 
             return _iMapper.Map<IEnumerable<TodoListSelectDto>>(todos);
+        }
+
+        /// <summary>
+        /// 透過 SQL 查詢 TodoList 後回傳
+        /// </summary>
+        /// <param name="orders"></param>
+        /// <returns></returns>
+        [HttpGet("GetTodoByRawSQL")]
+        public IEnumerable<TodoList> GetTodoByRawSQL([FromQuery] string orders)
+        {
+            var sql = $"select * from todolist where 1 = 1";
+
+            if (!string.IsNullOrEmpty(orders))
+            { 
+                sql += " and orders = {0}";
+            }
+
+            // 只能查 context 內定義的 dbset
+            var todos = _todoContext.TodoLists.FromSqlRaw(sql, orders).ToList();
+
+            // 可以查泛型的結果
+            // var orderList = _todoContext.Database.SqlQueryRaw<string>("select name from todolist where orders = {0}", orders).ToList();
+
+            return todos;
         }
 
         // GET api/<TodoController>/id
