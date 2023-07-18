@@ -123,8 +123,44 @@ namespace Todo.Controllers
 
         // POST api/<TodoController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        public IActionResult Post([FromBody] TodoList model)
         {
+            var insertData = new TodoList()
+            {
+                Name = model.Name,
+                Enable = model.Enable,
+                Orders = model.Orders,
+                InsertTime = DateTime.Now,
+                UpdateTime = DateTime.Now,
+                InsertEmployeeId = Guid.Parse("00000000-0000-0000-0000-000000000001"),
+                UpdateEmployeeId = Guid.Parse("00000000-0000-0000-0000-000000000001"),
+                UploadFiles = model.UploadFiles
+            };
+
+            _todoContext.TodoLists.Add(insertData);
+            _todoContext.SaveChanges();
+
+            return NoContent();
+        }
+
+        [HttpPost("PostBySQL")]
+        public IActionResult PostBySQL([FromBody] TodoList model)
+        {
+            var sql = @"INSERT INTO [dbo].[TodoList]([Name], [InsertTime], [UpdateTime], [Enable], [Orders], [InsertEmployeeId], [UpdateEmployeeId])
+                    VALUES(@Name, @InsertTime, @UpdateTime, @Enable, @Orders, @InsertEmployeeId, @UpdateEmployeeId)";
+
+            var pamameters = new List<SqlParameter>();
+            pamameters.Add(new SqlParameter("name", model.Name));
+            pamameters.Add(new SqlParameter("InsertTime", DateTime.Now));
+            pamameters.Add(new SqlParameter("UpdateTime", DateTime.Now));
+            pamameters.Add(new SqlParameter("Enable", model.Enable));
+            pamameters.Add(new SqlParameter("Orders", model.Orders));
+            pamameters.Add(new SqlParameter("InsertEmployeeId", Guid.Parse("00000000-0000-0000-0000-000000000001")));
+            pamameters.Add(new SqlParameter("UpdateEmployeeId", Guid.Parse("00000000-0000-0000-0000-000000000001")));
+
+            _todoContext.Database.ExecuteSqlRaw(sql, pamameters.ToArray());
+
+            return NoContent();
         }
 
         // PUT api/<TodoController>/5

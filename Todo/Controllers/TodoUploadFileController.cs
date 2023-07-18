@@ -77,5 +77,27 @@ namespace Todo.Controllers
 
             return Ok(uploadFile);
         }
+
+        // Post: api/<TodoUploadFileController>
+        [HttpPost]
+        public IActionResult Post(Guid todoId, [FromBody]UploadFile model)
+        {
+            if (!_todoContext.TodoLists.Any(x => x.TodoId == todoId))
+            {
+                return NotFound("找不到 todoId: " + todoId + "。");
+            }
+
+            var insertData = new UploadFile()
+            {
+                TodoId = model.TodoId,
+                Name = model.Name,
+                Src = model.Src
+            };
+
+            _todoContext.UploadFiles.Add(insertData);
+            _todoContext.SaveChanges();
+
+            return NoContent();
+        }
     }
 }
