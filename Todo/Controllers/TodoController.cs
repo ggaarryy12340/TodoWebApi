@@ -164,9 +164,37 @@ namespace Todo.Controllers
         }
 
         // PUT api/<TodoController>/5
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [HttpPut("{todoId}")]
+        public IActionResult Put(Guid todoId, [FromBody] TodoList model)
         {
+            // 更新方法 1:
+            //_todoContext.Entry(model).State = EntityState.Modified;
+            //_todoContext.SaveChanges();
+
+            // 更新方法 2: 
+            //_todoContext.Update(model);
+            //_todoContext.SaveChanges();
+
+            // 更新方法 3: 
+            var todoList = _todoContext.TodoLists.Find(todoId);
+
+            if (todoList == null)
+            {
+                return NotFound("找不到資源");
+            }
+
+            todoList.Name = model.Name;
+            todoList.Enable = model.Enable;
+            todoList.Orders = model.Orders;
+
+            todoList.InsertTime = DateTime.Now;
+            todoList.UpdateTime = DateTime.Now;
+            todoList.InsertEmployeeId = Guid.Parse("00000000-0000-0000-0000-000000000001");
+            todoList.UpdateEmployeeId = Guid.Parse("00000000-0000-0000-0000-000000000001");
+
+            _todoContext.SaveChanges();
+
+            return NoContent();
         }
 
         // DELETE api/<TodoController>/5
