@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -190,6 +191,27 @@ namespace Todo.Controllers
             todoList.UpdateTime = DateTime.Now;
             todoList.UpdateEmployeeId = Guid.Parse("00000000-0000-0000-0000-000000000001");
 
+            _todoContext.SaveChanges();
+
+            return NoContent();
+        }
+
+        // PATCH api/<TodoController>/5
+        [HttpPatch("{todoId}")]
+        public IActionResult Patch(Guid todoId, [FromBody] JsonPatchDocument jsonPatchDocument)
+        {
+            // 更新完整資料用 Put，更新局部資料用 Patch
+            var todoList = _todoContext.TodoLists.Find(todoId);
+
+            if (todoList == null)
+            {
+                return NotFound("找不到資源");
+            }
+
+            todoList.UpdateTime = DateTime.Now;
+            todoList.UpdateEmployeeId = Guid.Parse("00000000-0000-0000-0000-000000000001");
+
+            jsonPatchDocument.ApplyTo(todoList);
             _todoContext.SaveChanges();
 
             return NoContent();
