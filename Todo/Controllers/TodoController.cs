@@ -218,9 +218,24 @@ namespace Todo.Controllers
         }
 
         // DELETE api/<TodoController>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        [HttpDelete("{todoId}")]
+        public IActionResult Delete(Guid todoId)
         {
+            var deleteTodo = _todoContext.TodoLists.Find(todoId);
+
+            if (deleteTodo == null)
+            {
+                return NotFound("找不到要刪除的資源");
+            }
+
+            var deleteUploadFiles = _todoContext.UploadFiles.Where(x => x.TodoId == todoId);
+
+            _todoContext.UploadFiles.RemoveRange(deleteUploadFiles);
+            _todoContext.TodoLists.Remove(deleteTodo);
+
+            _todoContext.SaveChanges();
+
+            return NoContent();
         }
     }
 }
