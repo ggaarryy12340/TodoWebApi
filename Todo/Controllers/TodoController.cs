@@ -145,7 +145,7 @@ namespace Todo.Controllers
         }
 
         [HttpPost("PostBySQL")]
-        public IActionResult PostBySQL([FromBody] TodoList model)
+        public IActionResult PostBySQL([FromBody] TodoListPostDto model)
         {
             var sql = @"INSERT INTO [dbo].[TodoList]([Name], [InsertTime], [UpdateTime], [Enable], [Orders], [InsertEmployeeId], [UpdateEmployeeId])
                     VALUES(@Name, @InsertTime, @UpdateTime, @Enable, @Orders, @InsertEmployeeId, @UpdateEmployeeId)";
