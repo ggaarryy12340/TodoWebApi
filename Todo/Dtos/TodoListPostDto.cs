@@ -7,6 +7,7 @@ namespace Todo.Dtos
     public class TodoListPostDto
     {
         [TodoNameCheck]
+        [CustomErrMsg(true, "客製自訂模型驗證的錯誤訊息!")]
         public string Name { get; set; }
         public bool Enable { get; set; }
         public int Orders { get; set; }
