@@ -9,6 +9,7 @@ namespace Todo.ValidationAttributes
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             var todoContext = (TodoContext)validationContext.GetService(typeof(TodoContext));
+
             var name = (string)value;
 
             if (todoContext.TodoLists.Any(x => x.Name == name))
@@ -16,7 +17,7 @@ namespace Todo.ValidationAttributes
                 return new ValidationResult("已存在相同的代辦事項");
             }
 
-            return base.IsValid(value, validationContext);
+            return ValidationResult.Success;
         }
     }
 }
