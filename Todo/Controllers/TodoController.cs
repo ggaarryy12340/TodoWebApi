@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -15,6 +16,7 @@ namespace Todo.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class TodoController : ControllerBase
     {
         private readonly TodoContext _todoContext;
@@ -29,6 +31,7 @@ namespace Todo.Controllers
         }
 
         // GET: api/<TodoController>
+        [AllowAnonymous]
         [HttpGet]
         public IActionResult Get([FromQuery] TodoGetParameters todoGetParameters)
         {
