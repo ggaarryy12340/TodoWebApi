@@ -8,6 +8,7 @@ using Todo.Dtos;
 using System;
 using Microsoft.Data.SqlClient;
 using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.Http;
 
 namespace Todo.Services
 {
@@ -15,10 +16,12 @@ namespace Todo.Services
     {
         private readonly TodoContext _todoContext;
         private readonly IMapper _mapper;
-        public TodoListService(TodoContext todoContext, IMapper mapper)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public TodoListService(TodoContext todoContext, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         { 
             _todoContext = todoContext;
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public List<TodoList> GetAll(TodoGetParameters todoGetParameters)
@@ -93,6 +96,8 @@ namespace Todo.Services
 
         public TodoList Insert(TodoList model)
         {
+            var employeeId = _httpContextAccessor.HttpContext.User.Claims.First(x => x.Type == "EmployeeId").Value;
+
             var insertData = new TodoList()
             {
                 Name = model.Name,
@@ -100,8 +105,8 @@ namespace Todo.Services
                 Orders = model.Orders,
                 InsertTime = DateTime.Now,
                 UpdateTime = DateTime.Now,
-                InsertEmployeeId = Guid.Parse("00000000-0000-0000-0000-000000000001"),
-                UpdateEmployeeId = Guid.Parse("00000000-0000-0000-0000-000000000001"),
+                InsertEmployeeId = Guid.Parse(employeeId),
+                UpdateEmployeeId = Guid.Parse(employeeId),
                 UploadFiles = model.UploadFiles
             };
 

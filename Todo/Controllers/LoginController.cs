@@ -36,6 +36,7 @@ namespace Todo.Controllers
                 {
                     new Claim(ClaimTypes.Name, user.Account),
                     new Claim("FullName", user.Name),
+                    new Claim("EmployeeId", user.EmployeeId.ToString())
                 };
 
                 // 設定權限

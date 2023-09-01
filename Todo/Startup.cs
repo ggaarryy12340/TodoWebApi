@@ -31,6 +31,7 @@ namespace Todo
             services.AddDbContext<TodoContext>(options => options.UseSqlServer(Configuration.GetConnectionString("TodoDatabase")));
             services.AddAutoMapper(typeof(Startup));
             services.AddScoped<TodoListService>();
+            services.AddHttpContextAccessor();
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(option =>
             {
