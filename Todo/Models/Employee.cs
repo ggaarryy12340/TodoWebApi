@@ -21,6 +21,8 @@ public partial class Employee
 
     public virtual JobTitle JobTitle { get; set; }
 
+    public virtual ICollection<Role> Roles { get; set; } = new List<Role>();
+
     public virtual ICollection<TodoList> TodoListInsertEmployees { get; set; } = new List<TodoList>();
 
     public virtual ICollection<TodoList> TodoListUpdateEmployees { get; set; } = new List<TodoList>();

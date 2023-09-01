@@ -21,13 +21,15 @@ public partial class TodoContext : DbContext
 
     public virtual DbSet<JobTitle> JobTitles { get; set; }
 
+    public virtual DbSet<Role> Roles { get; set; }
+
     public virtual DbSet<TodoList> TodoLists { get; set; }
 
     public virtual DbSet<UploadFile> UploadFiles { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) 
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     { 
-    
+        
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -78,6 +80,20 @@ public partial class TodoContext : DbContext
             entity.Property(e => e.Name)
                 .IsRequired()
                 .HasMaxLength(50);
+        });
+
+        modelBuilder.Entity<Role>(entity =>
+        {
+            entity.HasKey(e => e.RoldId);
+
+            entity.ToTable("Role");
+
+            entity.Property(e => e.RoldId).ValueGeneratedNever();
+            entity.Property(e => e.Name).HasMaxLength(50);
+
+            entity.HasOne(d => d.Employee).WithMany(p => p.Roles)
+                .HasForeignKey(d => d.EmployeeId)
+                .HasConstraintName("FK_Role_Role");
         });
 
         modelBuilder.Entity<TodoList>(entity =>
