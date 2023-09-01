@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
+using System;
 
 namespace Todo.Controllers
 {
@@ -35,8 +36,18 @@ namespace Todo.Controllers
                 {
                     new Claim(ClaimTypes.Name, user.Account),
                     new Claim("FullName", user.Name),
-                   // new Claim(ClaimTypes.Role, "Administrator")
                 };
+
+                // 設定權限
+                var roleList = GetRoleList(user.EmployeeId);
+
+                if (roleList != null)
+                {
+                    foreach (var role in roleList)
+                    {
+                        claims.Add(new Claim(ClaimTypes.Role, role));
+                    }
+                }
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
@@ -55,6 +66,19 @@ namespace Todo.Controllers
         public string NotLogin()
         {
             return "未登入";
+        }
+
+        [HttpGet("AccessDenied")]
+        public string AccessDenied()
+        {
+            return "沒有權限";
+        }
+
+        private List<string> GetRoleList(Guid employeeId)
+        {
+            var roleList = _todoContext.Roles.Where(x => x.EmployeeId == employeeId).Select(x => x.Name).ToList();
+
+            return roleList;
         }
     }
 }

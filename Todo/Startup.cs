@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
 using Todo.Models;
 using Todo.Services;
 
@@ -34,6 +35,9 @@ namespace Todo
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(option =>
             {
                 option.LoginPath = new PathString("/api/Login/NotLogin");
+                option.AccessDeniedPath = new PathString("/api/Login/AccessDenied");
+                option.ExpireTimeSpan = TimeSpan.FromHours(2);
+                option.SlidingExpiration = true;
             });
         }
 

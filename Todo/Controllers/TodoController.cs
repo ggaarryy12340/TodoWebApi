@@ -16,7 +16,7 @@ namespace Todo.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(Roles = "Todo")]
     public class TodoController : ControllerBase
     {
         private readonly TodoContext _todoContext;
