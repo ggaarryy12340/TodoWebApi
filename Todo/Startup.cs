@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -6,7 +7,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using System;
+using System.Text;
 using Todo.Models;
 using Todo.Services;
 
@@ -33,13 +36,30 @@ namespace Todo
             services.AddScoped<TodoListService>();
             services.AddHttpContextAccessor();
 
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(option =>
+            #region For Cookies Auth
+            //services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(option =>
+            //{
+            //    option.LoginPath = new PathString("/api/Login/NotLogin");
+            //    option.AccessDeniedPath = new PathString("/api/Login/AccessDenied");
+            //    option.ExpireTimeSpan = TimeSpan.FromHours(2);
+            //    option.SlidingExpiration = true;
+            //});
+            #endregion
+
+            #region For JWT Auth
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
-                option.LoginPath = new PathString("/api/Login/NotLogin");
-                option.AccessDeniedPath = new PathString("/api/Login/AccessDenied");
-                option.ExpireTimeSpan = TimeSpan.FromHours(2);
-                option.SlidingExpiration = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = Configuration["Jwt:Issuer"],
+                    ValidateAudience = true,
+                    ValidAudience = Configuration["Jwt:Audience"],
+                    ValidateLifetime = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:KEY"]))
+                };
             });
+            #endregion
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

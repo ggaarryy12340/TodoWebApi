@@ -7,6 +7,10 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication;
 using System;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Microsoft.Extensions.Configuration;
 
 namespace Todo.Controllers
 {
@@ -15,10 +19,12 @@ namespace Todo.Controllers
     public class LoginController : ControllerBase
     {
         private readonly TodoContext _todoContext;
+        private readonly IConfiguration _configuration;
 
-        public LoginController(TodoContext todoContext)
+        public LoginController(TodoContext todoContext, IConfiguration configuration)
         { 
             _todoContext = todoContext;
+            _configuration = configuration;
         }
 
         [HttpPost]
@@ -54,6 +60,56 @@ namespace Todo.Controllers
                 HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
 
                 return "登入成功";
+            }
+        }
+
+        [HttpPost("JwtLogin")]
+        public string JwtLogin(LoginPostDto model)
+        {
+            var user = _todoContext.Employees.SingleOrDefault(x => x.Account == model.Account && x.Password == model.Password);
+
+            if (user == null)
+            {
+                return "帳號密碼錯誤";
+            }
+            else
+            {
+                 
+                var claims = new List<Claim>
+                {
+                    new Claim(JwtRegisteredClaimNames.Email, user.Account),
+                    new Claim("FullName", user.Name),
+                    new Claim(JwtRegisteredClaimNames.NameId, user.EmployeeId.ToString())
+                };
+
+                // 設定權限
+                var roleList = GetRoleList(user.EmployeeId);
+
+                if (roleList != null)
+                {
+                    foreach (var role in roleList)
+                    {
+                        claims.Add(new Claim(ClaimTypes.Role, role));
+                    }
+                }
+
+                var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:KEY"]));
+
+                var jwt = new JwtSecurityToken
+                    (
+                        issuer: _configuration["JWT:Issuer"],
+                        audience: _configuration["JWT:Audience"],
+                        claims: claims,
+                        expires: DateTime.Now.AddMinutes(30),
+                        signingCredentials: new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256)
+                    );
+
+                var token = new JwtSecurityTokenHandler().WriteToken(jwt);
+
+                //var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                //HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+
+                return token;
             }
         }
 
