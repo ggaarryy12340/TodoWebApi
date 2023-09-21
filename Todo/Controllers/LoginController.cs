@@ -106,9 +106,6 @@ namespace Todo.Controllers
 
                 var token = new JwtSecurityTokenHandler().WriteToken(jwt);
 
-                //var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                //HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
-
                 return token;
             }
         }

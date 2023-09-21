@@ -31,7 +31,6 @@ namespace Todo.Controllers
         }
 
         // GET: api/<TodoController>
-        [AllowAnonymous]
         [HttpGet]
         public IActionResult Get([FromQuery] TodoGetParameters todoGetParameters)
         {
@@ -48,6 +47,7 @@ namespace Todo.Controllers
         // GET: api/<TodoController>
         // 用 AutoMapper 轉成 TodoListSelectDtos 後傳出
         [HttpGet("GetByAutoMapper")]
+        [AllowAnonymous]
         public IEnumerable<TodoListSelectDto> GetByAutoMapper([FromQuery] TodoGetParameters todoGetParameters)
         {
             return _todoListService.GetByAutoMapper(todoGetParameters);

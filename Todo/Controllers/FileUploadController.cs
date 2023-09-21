@@ -2,21 +2,23 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using Todo.Filters;
 
 namespace Todo.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class FileUpload : ControllerBase
+    public class FileUploadController : ControllerBase
     {
         private readonly IWebHostEnvironment _env;
-        public FileUpload(IWebHostEnvironment env)
+        public FileUploadController(IWebHostEnvironment env)
         {
             _env = env;
         }
 
         // POST api/<FileUpload>
         [HttpPost]
+        [FileLimit(ExtentionLimit = ".txt", SizeLimit = 1)]
         public void Post(IFormFile file)
         {
             var rootPath = _env.ContentRootPath + "\\Upload\\";
