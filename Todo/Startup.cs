@@ -10,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Text;
+using Todo.Filters;
 using Todo.Models;
 using Todo.Services;
 
@@ -60,6 +61,11 @@ namespace Todo
                 };
             });
             #endregion
+
+            services.AddMvc(options => {
+                // ¥þ°ì®M¥Î TodoActionFilter
+                options.Filters.Add(typeof(TodoActionFilter));
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
